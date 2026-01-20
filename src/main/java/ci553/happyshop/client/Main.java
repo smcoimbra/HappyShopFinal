@@ -1,8 +1,13 @@
 package ci553.happyshop.client;
 
+import ci553.happyshop.authentication.CredentialStore;
+import ci553.happyshop.authentication.UserRole;
 import ci553.happyshop.client.customer.*;
 
 import ci553.happyshop.client.emergency.EmergencyExit;
+import ci553.happyshop.client.login.LoginController;
+import ci553.happyshop.client.login.LoginModel;
+import ci553.happyshop.client.login.LoginView;
 import ci553.happyshop.client.orderTracker.OrderTracker;
 import ci553.happyshop.client.picker.PickerController;
 import ci553.happyshop.client.picker.PickerModel;
@@ -12,6 +17,8 @@ import ci553.happyshop.client.warehouse.*;
 import ci553.happyshop.orderManagement.OrderHub;
 import ci553.happyshop.storageAccess.DatabaseRW;
 import ci553.happyshop.storageAccess.DatabaseRWFactory;
+import ci553.happyshop.utility.AudioManager;
+import ci553.happyshop.utility.ThemeManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -42,21 +49,100 @@ public class Main extends Application {
     //starts the system
     @Override
     public void start(Stage window) throws IOException {
-        startCustomerClient();
-        startPickerClient();
-        startOrderTracker();
+        // Initialize audio-visual system before launching clients
+        initializeAudioVisualSystem();
 
-        startCustomerClient();
-        startPickerClient();
-        startOrderTracker();
+        // Initialize CredentialStore and load credentials
+        CredentialStore credentialStore = CredentialStore.getInstance();
+        credentialStore.loadCredentials();
 
-        // Initializes the order map for the OrderHub. This must be called after starting the observer clients
-        // (such as OrderTracker and Picker clients) to ensure they are properly registered for receiving updates.
-        initializeOrderMap();
+        // Show login screen
+        showLoginScreen(window);
+    }
 
-        startWarehouseClient();
-        startWarehouseClient();
+    /**
+     * Initialize the audio-visual system (AudioManager and ThemeManager)
+     * Load settings and start background music
+     */
+    private void initializeAudioVisualSystem() {
+        // Initialize AudioManager and load settings
+        AudioManager audioManager = AudioManager.getInstance();
+        audioManager.loadSettings();
 
+        // Initialize ThemeManager and load theme
+        ThemeManager themeManager = ThemeManager.getInstance();
+        themeManager.loadTheme();
+
+        // Start background music playback
+        audioManager.playBackgroundMusic();
+    }
+
+    /**
+     * Displays the login screen and sets up authentication flow.
+     *
+     * @param primaryStage The primary stage for the login window
+     */
+    private void showLoginScreen(Stage primaryStage) {
+        // Create MVC components for login
+        LoginView loginView = new LoginView();
+        LoginController loginController = new LoginController();
+        LoginModel loginModel = new LoginModel();
+
+        // Wire components together
+        loginView.loginController = loginController;
+        loginController.loginModel = loginModel;
+        loginModel.loginView = loginView;
+
+        // Set callback for successful login
+        loginController.setOnLoginSuccess((username, role) -> {
+            System.out.println("Login successful: " + username + " (" + role + ")");
+
+            // Close login window
+            loginView.closeLoginWindow();
+
+            // Launch appropriate client based on role
+            launchClientForRole(role);
+        });
+
+        // Start login view
+        loginView.start(primaryStage);
+
+        // Register login scene with ThemeManager
+        if (primaryStage.getScene() != null) {
+            ThemeManager.getInstance().registerScene(primaryStage.getScene());
+        }
+    }
+
+    /**
+     * Launches the appropriate client interface based on user role.
+     * Also initializes OrderHub for PICKER and TRACKER roles.
+     * Starts EmergencyExit for all roles.
+     *
+     * @param role The user's role determining which client to launch
+     */
+    private void launchClientForRole(UserRole role) {
+        switch (role) {
+            case CUSTOMER:
+                startCustomerClient();
+                break;
+            case PICKER:
+                startPickerClient();
+                startOrderTracker();
+                initializeOrderMap();
+                break;
+            case WAREHOUSE:
+                startWarehouseClient();
+                break;
+            case TRACKER:
+                startOrderTracker();
+                initializeOrderMap();
+                break;
+            default:
+                System.err.println("Unknown user role: " + role);
+                return;
+        }
+
+        // Start EmergencyExit for all roles
         startEmergencyExit();
     }
 
@@ -79,7 +165,14 @@ public class Main extends Application {
         cusController.cusModel = cusModel;
         cusModel.cusView = cusView;
         cusModel.databaseRW = databaseRW;
-        cusView.start(new Stage());
+
+        Stage stage = new Stage();
+        cusView.start(stage);
+
+        // Register scene with ThemeManager
+        if (stage.getScene() != null) {
+            ThemeManager.getInstance().registerScene(stage.getScene());
+        }
 
         //RemoveProductNotifier removeProductNotifier = new RemoveProductNotifier();
         //removeProductNotifier.cusView = cusView;
@@ -102,7 +195,14 @@ public class Main extends Application {
         pickerController.pickerModel = pickerModel;
         pickerModel.pickerView = pickerView;
         pickerModel.registerWithOrderHub();
-        pickerView.start(new Stage());
+
+        Stage stage = new Stage();
+        pickerView.start(stage);
+
+        // Register scene with ThemeManager
+        if (stage.getScene() != null) {
+            ThemeManager.getInstance().registerScene(stage.getScene());
+        }
     }
 
     //The OrderTracker GUI - for customer to track their order's state(Ordered, Progressing, Collected)
@@ -111,6 +211,12 @@ public class Main extends Application {
     private void startOrderTracker(){
         OrderTracker orderTracker = new OrderTracker();
         orderTracker.registerWithOrderHub();
+
+        // Register scene with ThemeManager
+        // Note: OrderTracker creates its own Stage internally, so we need to get it
+        if (orderTracker.getScene() != null) {
+            ThemeManager.getInstance().registerScene(orderTracker.getScene());
+        }
     }
 
     //initialize the orderMap<orderId, orderState> for OrderHub during system startup
@@ -139,7 +245,14 @@ public class Main extends Application {
         controller.model = model;
         model.view = view;
         model.databaseRW = databaseRW;
-        view.start(new Stage());
+
+        Stage stage = new Stage();
+        view.start(stage);
+
+        // Register scene with ThemeManager
+        if (stage.getScene() != null) {
+            ThemeManager.getInstance().registerScene(stage.getScene());
+        }
 
         //create dependent views that need window info
         HistoryWindow historyWindow = new HistoryWindow();
@@ -150,11 +263,24 @@ public class Main extends Application {
         model.alertSimulator = alertSimulator;
         historyWindow.warehouseView = view;
         alertSimulator.warehouseView = view;
+
+        // Register dependent window scenes with ThemeManager
+        if (historyWindow.getScene() != null) {
+            ThemeManager.getInstance().registerScene(historyWindow.getScene());
+        }
+        if (alertSimulator.getScene() != null) {
+            ThemeManager.getInstance().registerScene(alertSimulator.getScene());
+        }
     }
 
     //starts the EmergencyExit GUI, - used to close the entire application immediatelly
     private void startEmergencyExit(){
-        EmergencyExit.getEmergencyExit();
+        EmergencyExit emergencyExit = EmergencyExit.getEmergencyExit();
+
+        // Register scene with ThemeManager
+        if (emergencyExit.getScene() != null) {
+            ThemeManager.getInstance().registerScene(emergencyExit.getScene());
+        }
     }
 }
 

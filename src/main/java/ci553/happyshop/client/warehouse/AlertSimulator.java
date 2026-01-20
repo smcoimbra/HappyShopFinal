@@ -1,5 +1,7 @@
 package ci553.happyshop.client.warehouse;
 
+import ci553.happyshop.utility.AudioManager;
+import ci553.happyshop.utility.SoundEffect;
 import ci553.happyshop.utility.UIStyle;
 import ci553.happyshop.utility.WindowBounds;
 import javafx.geometry.Pos;
@@ -24,7 +26,7 @@ import javafx.stage.StageStyle;
  * 2. Stage Decoration Control: By using a custom Stage with `StageStyle.UNDECORATED`, we prevent the user from minimizing, resizing, or closing the alert using the standard window controls. This ensures that the alert is always visible and that the user cannot ignore it, forcing them to interact with the alert before proceeding.
  * 3. Emergency Shutdown (ESD): The built-in Alert blocks interaction and doesn't allow for forceful closure or shutdown. Using a custom Stage, we can ensure that the alert can be forcibly closed during ESD.
  * This solution gives us the necessary control over the user interaction flow, visual presentation, and prevents any way of bypassing the error handling process, which isn't possible with the standard Alert class.
-*/
+ */
 
 /**
  * This class provides a simple alert simulation window to display error messages.
@@ -47,6 +49,16 @@ public class AlertSimulator {
     private  Label laErrorMsg;// Label to display error messages
     private TextArea taErrorMsg;// Label to display error messages
 
+    /**
+     * Get the scene for theme management
+     */
+    public Scene getScene() {
+        if (scene == null) {
+            createScene();
+        }
+        return scene;
+    }
+
     // Create the Scene (only once)
     private  void createScene() {
         Label laTitle = new Label("\u26A0 Please fix input errors..."); // for emoji ⚠️
@@ -57,7 +69,7 @@ public class AlertSimulator {
         taErrorMsg.setWrapText(true);// text wraps if long
         taErrorMsg.setStyle(UIStyle.alertContentTextAreaStyle);
 
-        VBox vbLaTaMsg = new VBox(3, laTitle, taErrorMsg); 
+        VBox vbLaTaMsg = new VBox(3, laTitle, taErrorMsg);
         vbLaTaMsg.setAlignment(Pos.CENTER_LEFT); // Wrap two labels in a VBox to align it left
 
         Button btnOk = new Button("Ok");
@@ -65,6 +77,7 @@ public class AlertSimulator {
         HBox hbBtnOk = new HBox(btnOk);
         hbBtnOk.setAlignment(Pos.CENTER); //aligned to right
         btnOk.setOnAction(e -> {
+            AudioManager.getInstance().playEffect(SoundEffect.BUTTON_CLICK);
             window.close();
         });
 

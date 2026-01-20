@@ -1,11 +1,14 @@
 package ci553.happyshop.client.picker;
 
+import ci553.happyshop.utility.Theme;
+import ci553.happyshop.utility.ThemeManager;
 import ci553.happyshop.utility.UIStyle;
 import ci553.happyshop.utility.WinPosManager;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -35,17 +38,32 @@ public class PickerView  {
 
     //Three controllers needs updating when program going on
     private TextArea taOrderMap = new TextArea();
-          // TextArea for displaying a list of orders and their states(orderId → state)
+    // TextArea for displaying a list of orders and their states(orderId → state)
     private TextArea taOrderDetail = new TextArea();
-        // TextArea for displaying detailed information about the selected order after it is assigned to the picker.
+    // TextArea for displaying detailed information about the selected order after it is assigned to the picker.
     private Label laDetailRootTitle;
-       // Label used as the title for the Order Detail section.
-       // Reminds the picker not to close the window if the order hasn't been collected by the customer.
+    // Label used as the title for the Order Detail section.
+    // Reminds the picker not to close the window if the order hasn't been collected by the customer.
 
     public void start(Stage window) {
         vbOrderMapRoot = createOrderMapRoot();
         vbOrderDetailRoot = createOrderDetailRoot();
-        scene = new Scene(vbOrderMapRoot, WIDTH, HEIGHT);
+
+        // Create theme selector
+        ComboBox<Theme> cbTheme = createThemeSelector();
+
+        // Wrap content with theme selector
+        BorderPane rootWithTheme = new BorderPane();
+        rootWithTheme.setCenter(vbOrderMapRoot);
+        rootWithTheme.setTop(cbTheme);
+        BorderPane.setAlignment(cbTheme, Pos.TOP_RIGHT);
+        BorderPane.setMargin(cbTheme, new javafx.geometry.Insets(10, 10, 0, 0));
+
+        scene = new Scene(rootWithTheme, WIDTH, HEIGHT);
+
+        // Register scene with ThemeManager
+        ThemeManager.getInstance().registerScene(scene);
+
         window.setScene(scene);
         window.setTitle("🛒 HappyShop Order Picker");
         WinPosManager.registerWindow(window,WIDTH,HEIGHT); //calculate position x and y for this window
@@ -106,13 +124,27 @@ public class PickerView  {
             // Based on the button's text, performs the appropriate action and switches the displayed root.
             switch (btnText) {
                 case "Progressing":
-                    scene.setRoot(vbOrderDetailRoot); // switch to OrderDetailRoot
+                    // Switch to OrderDetailRoot with theme selector
+                    BorderPane rootWithTheme = new BorderPane();
+                    ComboBox<Theme> cbTheme = createThemeSelector();
+                    rootWithTheme.setCenter(vbOrderDetailRoot);
+                    rootWithTheme.setTop(cbTheme);
+                    BorderPane.setAlignment(cbTheme, Pos.TOP_RIGHT);
+                    BorderPane.setMargin(cbTheme, new javafx.geometry.Insets(10, 10, 0, 0));
+                    scene.setRoot(rootWithTheme);
                     pickerController.doProgressing();
                     break;
 
                 case "Customer Collected":
                     pickerController.doCollected();
-                    scene.setRoot(vbOrderMapRoot); // switch back to orderMapRoot
+                    // Switch back to orderMapRoot with theme selector
+                    BorderPane rootWithTheme2 = new BorderPane();
+                    ComboBox<Theme> cbTheme2 = createThemeSelector();
+                    rootWithTheme2.setCenter(vbOrderMapRoot);
+                    rootWithTheme2.setTop(cbTheme2);
+                    BorderPane.setAlignment(cbTheme2, Pos.TOP_RIGHT);
+                    BorderPane.setMargin(cbTheme2, new javafx.geometry.Insets(10, 10, 0, 0));
+                    scene.setRoot(rootWithTheme2);
                     break;
             }
         } catch (IOException e) {
@@ -124,5 +156,25 @@ public class PickerView  {
         taOrderMap.setText(strOrderMap);
         taOrderDetail.setText(strOrderDetail);
         laDetailRootTitle.setText("Progressing Order Details");
+    }
+
+    /**
+     * Create theme selector ComboBox
+     */
+    private ComboBox<Theme> createThemeSelector() {
+        ComboBox<Theme> cbTheme = new ComboBox<>();
+        cbTheme.getItems().addAll(Theme.values());
+        cbTheme.setValue(ThemeManager.getInstance().getCurrentTheme());
+        cbTheme.setStyle(UIStyle.comboBoxStyle);
+
+        // Bind to ThemeManager
+        cbTheme.setOnAction(event -> {
+            Theme selectedTheme = cbTheme.getValue();
+            if (selectedTheme != null) {
+                ThemeManager.getInstance().setTheme(selectedTheme);
+            }
+        });
+
+        return cbTheme;
     }
 }

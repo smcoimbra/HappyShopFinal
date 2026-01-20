@@ -52,7 +52,7 @@ public class PickerModel {
     private static TreeSet<Integer> lockedOrderIds = new TreeSet<>(); // Track locked orders by orderId
 
     private int theOrderId=0; //Order ID assigned to a picker;
-                              // 0 means no order is currently assigned.
+    // 0 means no order is currently assigned.
     private OrderState theOrderState;
 
     /**

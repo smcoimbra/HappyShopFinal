@@ -2,6 +2,8 @@ package ci553.happyshop.client.warehouse;
 
 import ci553.happyshop.catalogue.Product;
 import ci553.happyshop.utility.StorageLocation;
+import ci553.happyshop.utility.Theme;
+import ci553.happyshop.utility.ThemeManager;
 import ci553.happyshop.utility.UIStyle;
 import ci553.happyshop.utility.WinPosManager;
 import ci553.happyshop.utility.WindowBounds;
@@ -13,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -146,7 +149,21 @@ public class WarehouseView  {
         HBox hbRoot = new HBox(15, vbSearchPage, lineContainer, vbProductFormPage);
         hbRoot.setStyle(UIStyle.rootStyleWarehouse);
 
-        Scene scene = new Scene(hbRoot, WIDTH, HEIGHT);
+        // Create theme selector
+        ComboBox<Theme> cbTheme = createThemeSelector();
+
+        // Wrap content with theme selector
+        BorderPane root = new BorderPane();
+        root.setCenter(hbRoot);
+        root.setTop(cbTheme);
+        BorderPane.setAlignment(cbTheme, Pos.TOP_RIGHT);
+        BorderPane.setMargin(cbTheme, new javafx.geometry.Insets(10, 10, 0, 0));
+
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+
+        // Register scene with ThemeManager
+        ThemeManager.getInstance().registerScene(scene);
+
         window.setScene(scene);
         window.setTitle("Search_Page  🛒🛒HappyShop_Warehouse🛒🛒  ProductForm_Page(Edit & AddNew Product)");
         WinPosManager.registerWindow(window,WIDTH,HEIGHT); // Registers the window with WinPosManager to
@@ -491,7 +508,7 @@ public class WarehouseView  {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg"));
         File file = fileChooser.showOpenDialog(null); //return absolute fullpath of the user selected file
-                                                              //eg C:/Users/John/Pictures/sample.jpg
+        //eg C:/Users/John/Pictures/sample.jpg
         if (file != null) {
 
             if (theProFormMode.equals("EDIT")) {
@@ -556,20 +573,40 @@ public class WarehouseView  {
     }
 
     void resetNewProChild() {
-       tfIdNewPro.setText("");
-       tfPriceNewPro.setText("");
-       tfStockNewPro.setText("");
-       taDescriptionNewPro.setText("");
-       ivProNewPro.setImage(new Image("WarehouseImageHolder.jpg"));
-       imageUriNewPro = null; //clear the selcted image
-       System.out.println("resetNewProChild in view called");
+        tfIdNewPro.setText("");
+        tfPriceNewPro.setText("");
+        tfStockNewPro.setText("");
+        taDescriptionNewPro.setText("");
+        ivProNewPro.setImage(new Image("WarehouseImageHolder.jpg"));
+        imageUriNewPro = null; //clear the selcted image
+        System.out.println("resetNewProChild in view called");
     }
 
     WindowBounds getWindowBounds() {
         return new WindowBounds(viewWindow.getX(),
-                                viewWindow.getY(),
-                                viewWindow.getWidth(),
-                                viewWindow.getHeight());
+                viewWindow.getY(),
+                viewWindow.getWidth(),
+                viewWindow.getHeight());
+    }
+
+    /**
+     * Create theme selector ComboBox
+     */
+    private ComboBox<Theme> createThemeSelector() {
+        ComboBox<Theme> cbTheme = new ComboBox<>();
+        cbTheme.getItems().addAll(Theme.values());
+        cbTheme.setValue(ThemeManager.getInstance().getCurrentTheme());
+        cbTheme.setStyle(UIStyle.comboBoxStyle);
+
+        // Bind to ThemeManager
+        cbTheme.setOnAction(event -> {
+            Theme selectedTheme = cbTheme.getValue();
+            if (selectedTheme != null) {
+                ThemeManager.getInstance().setTheme(selectedTheme);
+            }
+        });
+
+        return cbTheme;
     }
 
     //   //another way to reset the editChild and NewProChild

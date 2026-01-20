@@ -28,6 +28,16 @@ public class HistoryWindow {
     private  Scene scene;
     private  TextArea taHistory;
 
+    /**
+     * Get the scene for theme management
+     */
+    public Scene getScene() {
+        if (scene == null) {
+            createScene();
+        }
+        return scene;
+    }
+
     // Create the scene only once (to avoid recreating it multiple times)
     private  void createScene() {
         // a TextArea to show stock management history

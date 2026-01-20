@@ -4,6 +4,8 @@ import ci553.happyshop.catalogue.Product;
 import ci553.happyshop.storageAccess.DatabaseRW;
 import ci553.happyshop.storageAccess.DerbyRW;
 import ci553.happyshop.storageAccess.ImageFileManager;
+import ci553.happyshop.utility.AudioManager;
+import ci553.happyshop.utility.SoundEffect;
 import ci553.happyshop.utility.StorageLocation;
 
 import java.io.IOException;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 public class WarehouseModel {
     public WarehouseView view;
     public DatabaseRW databaseRW; //Interface type, not specific implementation
-                         //Benefits: Flexibility: Easily change the database implementation.
+    //Benefits: Flexibility: Easily change the database implementation.
 
     private ArrayList<Product> productList = new ArrayList<>(); // search results fetched from the database
     private Product theSelectedPro; // the product selected from the ListView before the user edits or deletes
@@ -34,7 +36,7 @@ public class WarehouseModel {
     public AlertSimulator alertSimulator;
     private String displayInputErrorMsg =""; //error message showing in the alertSimulator
     private ArrayList<String> displayManageHistory = new ArrayList<>();// Manage Product history
-                                                               //shows in the HistoryWindow
+    //shows in the HistoryWindow
     private enum ManageProductType{
         Edited,
         Deleted,
@@ -118,14 +120,14 @@ public class WarehouseModel {
     }
 
     void doCancel(){
-       if(view.theProFormMode.equals("EDIT")){
-           updateView(UpdateForAction.BtnCancelEdit);
-           theSelectedPro = null;
-       }
-       if(view.theProFormMode.equals("NEW")){
-           updateView(UpdateForAction.BtnCancelNew);
-           theNewProId = null;
-       }
+        if(view.theProFormMode.equals("EDIT")){
+            updateView(UpdateForAction.BtnCancelEdit);
+            theSelectedPro = null;
+        }
+        if(view.theProFormMode.equals("NEW")){
+            updateView(UpdateForAction.BtnCancelNew);
+            theNewProId = null;
+        }
     }
     void doSummit() throws SQLException, IOException {
         if(view.theProFormMode.equals("EDIT")){
@@ -156,6 +158,7 @@ public class WarehouseModel {
             }
 
             if(validateInputEditChild(textPrice,textStock,description)==false){
+                AudioManager.getInstance().playEffect(SoundEffect.ERROR_NOTIFICATION);
                 updateView(UpdateForAction.ShowInputErrorMsg);
             }
             else{
@@ -170,6 +173,7 @@ public class WarehouseModel {
         }
         else{
             System.out.println("No Product Selected");
+            AudioManager.getInstance().playEffect(SoundEffect.ERROR_NOTIFICATION);
         }
     }
 
@@ -179,6 +183,7 @@ public class WarehouseModel {
         String TextChangeBy = view.tfChangeByEdit.getText().trim();
         if(!TextChangeBy.isEmpty()){
             if(validateInputChangeStockBy(TextChangeBy)==false){
+                AudioManager.getInstance().playEffect(SoundEffect.ERROR_NOTIFICATION);
                 updateView(UpdateForAction.ShowInputErrorMsg);
             } else{
                 int changeBy = Integer.parseInt(TextChangeBy);
@@ -224,6 +229,7 @@ public class WarehouseModel {
 
         //validate input
         if (validateInputNewProChild(theNewProId, textPrice, textStock, description, iPath) ==false) {
+            AudioManager.getInstance().playEffect(SoundEffect.ERROR_NOTIFICATION);
             updateView(UpdateForAction.ShowInputErrorMsg);
         } else {
             //copy the user selected image to project image folder and using productId as image name
@@ -241,7 +247,7 @@ public class WarehouseModel {
     }
 
     private  boolean validateInputEditChild(String txPrice, String txStock,
-                                         String description) throws SQLException {
+                                            String description) throws SQLException {
 
         StringBuilder errorMessage = new StringBuilder();
 
@@ -290,7 +296,7 @@ public class WarehouseModel {
     }
 
     private  boolean validateInputNewProChild(String id, String txPrice, String txStock,
-                                   String description, String imageUri) throws SQLException {
+                                              String description, String imageUri) throws SQLException {
 
         StringBuilder errorMessage = new StringBuilder();
         // Validate Id (must be exactly 4 digits)
