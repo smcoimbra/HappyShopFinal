@@ -59,26 +59,26 @@ public class Product implements Comparable<Product> {
     // Used in the Warehouse search page to display searched product information
     public String toString() {
         String productInfo = String.format("Id: %s, £%.2f/uint, stock: %d \n%s",
-                          proId, unitPrice,stockQuantity,proDescription);
+                proId, unitPrice,stockQuantity,proDescription);
         return productInfo;
     }
 
     /** alternative constructors retained for possible future use.
      *
-    public Product(String id, String des, double aPrice, int orderedQuantity, int stockQuantity) {
-        proId = id;
-        proDescription = des;
-        unitPrice = aPrice;
-        this.orderedQuantity = orderedQuantity;
-        this.stockQuantity = stockQuantity;
-    }
+     public Product(String id, String des, double aPrice, int orderedQuantity, int stockQuantity) {
+     proId = id;
+     proDescription = des;
+     unitPrice = aPrice;
+     this.orderedQuantity = orderedQuantity;
+     this.stockQuantity = stockQuantity;
+     }
 
-    public Product(String id, String des, double aPrice, int orderedQuantity) {
-        proId = id;
-        proDescription = des;
-        unitPrice = aPrice;
-        this.orderedQuantity = orderedQuantity;
-    }
+     public Product(String id, String des, double aPrice, int orderedQuantity) {
+     proId = id;
+     proDescription = des;
+     unitPrice = aPrice;
+     this.orderedQuantity = orderedQuantity;
+     }
      */
 
 }

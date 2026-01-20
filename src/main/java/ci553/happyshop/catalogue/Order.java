@@ -75,7 +75,7 @@ public class Order {
                 progressingDateTime,
                 collectedDateTime,
                 ProductListFormatter.buildString(productList)
-                );
+        );
     }
 }
 
