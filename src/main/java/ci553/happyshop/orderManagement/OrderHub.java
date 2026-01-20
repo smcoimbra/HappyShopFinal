@@ -69,7 +69,7 @@ public class OrderHub  {
     public static OrderHub getOrderHub() {
         if (orderHub == null)
             orderHub = new OrderHub();
-            return orderHub;
+        return orderHub;
     }
 
     //Creates a new order using the provided list of products.
@@ -88,7 +88,7 @@ public class OrderHub  {
         orderMap.put(orderId, theOrder.getState()); //add the order to orderMap,state is Ordered initially
         notifyOrderTrackers(); //notify OrderTrackers
         notifyPickerModels();//notify pickers
-        
+
         return theOrder;
     }
 
@@ -96,7 +96,7 @@ public class OrderHub  {
     public void registerOrderTracker(OrderTracker orderTracker){
         orderTrackerList.add(orderTracker);
     }
-     //Notifies all registered observer_OrderTrackers to update and display the latest orderMap.
+    //Notifies all registered observer_OrderTrackers to update and display the latest orderMap.
     public void notifyOrderTrackers(){
         for(OrderTracker orderTracker : orderTrackerList){
             orderTracker.setOrderMap(orderMap);

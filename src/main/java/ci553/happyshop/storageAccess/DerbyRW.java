@@ -254,7 +254,7 @@ public class DerbyRW implements DatabaseRW {
         }
     }
 
-//warehouse delete an existing product
+    //warehouse delete an existing product
     public void deleteProduct(String proId) throws SQLException {
         lock.lock();
         String selectSql = "SELECT * FROM ProductTable WHERE productID = ?";
@@ -295,7 +295,7 @@ public class DerbyRW implements DatabaseRW {
     //warehouse tries to add a new prodcut, id must be unique
     public boolean isProIdAvailable(String proId) throws SQLException {
         String query = "SELECT COUNT(*) FROM ProductTable WHERE productID = ?";
-                             //the count of records that match the given proId.
+        //the count of records that match the given proId.
         try (Connection conn = DriverManager.getConnection(dbURL);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, proId);
@@ -319,8 +319,8 @@ public class DerbyRW implements DatabaseRW {
         String insertSql = "INSERT INTO ProductTable VALUES(?, ?, ?, ?, ?)";
         String selectSql = "SELECT * FROM ProductTable WHERE productID = ?";
         try (Connection conn = DriverManager.getConnection(dbURL);
-        PreparedStatement insertStmt = conn.prepareStatement(insertSql);
-        PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+             PreparedStatement insertStmt = conn.prepareStatement(insertSql);
+             PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
             conn.setAutoCommit(true); // Set auto-commit to true immediately
             insertStmt.setString(1, id);
             insertStmt.setString(2, des);
