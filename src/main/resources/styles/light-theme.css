@@ -1,0 +1,149 @@
+/* Light Theme for HappyShop Application */
+
+/* Root styling */
+.root {
+    -fx-base: #f4f4f4;
+    -fx-background: #ffffff;
+    -fx-control-inner-background: #ffffff;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+}
+
+/* Title labels */
+.label-title {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.button:pressed {
+    -fx-background-color: #1f6391;
+}
+
+/* Red buttons (for remove/cancel actions) */
+.button.red-button {
+    -fx-background-color: #e74c3c;
+}
+
+.button.red-button:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* Text fields */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-padding: 5px;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+    -fx-border-width: 2px;
+}
+
+/* Text areas */
+.text-area {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-text-fill: #333333;
+    -fx-font-size: 13px;
+}
+
+.text-area .content {
+    -fx-background-color: white;
+}
+
+/* List views */
+.list-view {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.list-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #333333;
+    -fx-padding: 5px;
+}
+
+.list-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.list-cell:hover {
+    -fx-background-color: #ecf0f1;
+}
+
+/* Combo boxes */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #333333;
+}
+
+/* Spinners */
+.spinner {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.spinner .text-field {
+    -fx-text-fill: #333333;
+}
+
+/* Scroll bars */
+.scroll-bar {
+    -fx-background-color: #ecf0f1;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #95a5a6;
+}
+
+/* Panes */
+.pane {
+    -fx-background-color: #ffffff;
+}
+
+/* VBox and HBox */
+.vbox, .hbox {
+    -fx-background-color: #ffffff;
+}

@@ -1,0 +1,152 @@
+/* Colorful Theme for HappyShop Application */
+
+/* Root styling */
+.root {
+    -fx-base: #fff5e6;
+    -fx-background: linear-gradient(to bottom, #ffeaa7, #fab1a0);
+    -fx-control-inner-background: #ffffff;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #2d3436;
+    -fx-font-size: 14px;
+}
+
+/* Title labels */
+.label-title {
+    -fx-text-fill: #6c5ce7;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: linear-gradient(to bottom, #a29bfe, #6c5ce7);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #6c5ce7, #5f3dc4);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 8, 0, 0, 3);
+}
+
+.button:pressed {
+    -fx-background-color: #5f3dc4;
+}
+
+/* Red buttons (for remove/cancel actions) */
+.button.red-button {
+    -fx-background-color: linear-gradient(to bottom, #ff7675, #d63031);
+}
+
+.button.red-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #d63031, #c0392b);
+}
+
+/* Text fields */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #a29bfe;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-text-fill: #2d3436;
+    -fx-font-size: 14px;
+    -fx-padding: 5px;
+}
+
+.text-field:focused {
+    -fx-border-color: #6c5ce7;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, rgba(108,92,231,0.3), 5, 0, 0, 0);
+}
+
+/* Text areas */
+.text-area {
+    -fx-background-color: white;
+    -fx-border-color: #a29bfe;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-text-fill: #2d3436;
+    -fx-font-size: 13px;
+}
+
+.text-area .content {
+    -fx-background-color: white;
+}
+
+/* List views */
+.list-view {
+    -fx-background-color: white;
+    -fx-border-color: #a29bfe;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+.list-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #2d3436;
+    -fx-padding: 5px;
+}
+
+.list-cell:selected {
+    -fx-background-color: linear-gradient(to right, #a29bfe, #6c5ce7);
+    -fx-text-fill: white;
+}
+
+.list-cell:hover {
+    -fx-background-color: #dfe6e9;
+}
+
+/* Combo boxes */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #a29bfe;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #2d3436;
+}
+
+/* Spinners */
+.spinner {
+    -fx-background-color: white;
+    -fx-border-color: #a29bfe;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+.spinner .text-field {
+    -fx-text-fill: #2d3436;
+}
+
+/* Scroll bars */
+.scroll-bar {
+    -fx-background-color: #ffeaa7;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #a29bfe;
+    -fx-background-radius: 5px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #6c5ce7;
+}
+
+/* Panes */
+.pane {
+    -fx-background-color: linear-gradient(to bottom, #ffeaa7, #fab1a0);
+}
+
+/* VBox and HBox */
+.vbox, .hbox {
+    -fx-background-color: transparent;
+}

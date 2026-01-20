@@ -1,5 +1,7 @@
 package ci553.happyshop.client.emergency;
 
+import ci553.happyshop.utility.AudioManager;
+import ci553.happyshop.utility.SoundEffect;
 import ci553.happyshop.utility.UIStyle;
 import ci553.happyshop.utility.WinPosManager;
 import javafx.application.Platform;
@@ -17,12 +19,20 @@ public class EmergencyExit {
     private final int WIDTH = UIStyle.EmergencyExitWinWidth;
     private final int HEIGHT = UIStyle.EmergencyExitWinHeight;
     private static EmergencyExit emergencyExit;
+    private Scene scene; // Store scene reference for theme management
 
     //used by Main class to get the single instance
     public static EmergencyExit getEmergencyExit() {
         if (emergencyExit == null)
             emergencyExit = new EmergencyExit();
         return emergencyExit;
+    }
+
+    /**
+     * Get the scene for theme management
+     */
+    public Scene getScene() {
+        return scene;
     }
 
     //Private constructor creates a shutdown window.
@@ -36,6 +46,7 @@ public class EmergencyExit {
         Button btnExit = new Button();
         btnExit.setGraphic(ivExit);
         btnExit.setOnAction(event -> {
+            AudioManager.getInstance().playEffect(SoundEffect.BUTTON_CLICK);
             Platform.exit(); // Gracefully exit JavaFX
             System.exit(0);//forcefully shut down JVM (in case there are non-JavaFX threads)
         });
@@ -44,7 +55,7 @@ public class EmergencyExit {
         borderPane.setCenter(btnExit);
 
         borderPane.setStyle(UIStyle.rootStyle);
-        Scene scene = new Scene(borderPane, WIDTH, HEIGHT);
+        scene = new Scene(borderPane, WIDTH, HEIGHT);
         Stage window = new Stage();
         window.setScene(scene);
         window.setTitle("🛒 EXIT");

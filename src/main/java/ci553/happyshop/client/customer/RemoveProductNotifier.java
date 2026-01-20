@@ -1,5 +1,7 @@
 package ci553.happyshop.client.customer;
 
+import ci553.happyshop.utility.AudioManager;
+import ci553.happyshop.utility.SoundEffect;
 import ci553.happyshop.utility.UIStyle;
 import ci553.happyshop.utility.WindowBounds;
 import javafx.geometry.Pos;
@@ -59,6 +61,7 @@ public class RemoveProductNotifier {
         Button btnOk = new Button("Ok");
         btnOk.setStyle(UIStyle.alertBtnStyle);
         btnOk.setOnAction(e -> {
+            AudioManager.getInstance().playEffect(SoundEffect.BUTTON_CLICK);
             window.close();
         });
 

@@ -60,8 +60,7 @@ public class Order {
     /**
      * order details written to file, used by OrderHub
      *  - Order metadata (ID, state, and three timestamps)
-     *  -Product details included in the order
-     */
+     *  -Product details included in the order*/
     public String orderDetails() {
         return String.format("Order ID: %s \n" +
                         "State: %s \n" +

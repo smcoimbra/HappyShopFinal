@@ -1,5 +1,8 @@
 package ci553.happyshop.client.customer;
 
+import ci553.happyshop.catalogue.Product;
+import ci553.happyshop.utility.Theme;
+import ci553.happyshop.utility.ThemeManager;
 import ci553.happyshop.utility.UIStyle;
 import ci553.happyshop.utility.WinPosManager;
 import ci553.happyshop.utility.WindowBounds;
@@ -17,6 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * The CustomerView is separated into two sections by a line :
@@ -37,13 +41,14 @@ public class CustomerView  {
     private VBox vbTrolleyPage;  //vbTrolleyPage and vbReceiptPage will swap with each other when need
     private VBox vbReceiptPage;
 
-    TextField tfId; //for user input on the search page. Made accessible so it can be accessed or modified by CustomerModel
-    TextField tfName; //for user input on the search page. Made accessible so it can be accessed by CustomerModel
+    public TextField tfSearch; //unified search field for product ID or name. Made accessible so it can be accessed by CustomerModel
+    public ListView<Product> lvSearchResults; //ListView for displaying multiple search results
+    public ListView<Product> lvTrolley; //ListView for displaying trolley items with interactive controls
+    public Spinner<Integer> spnSearchQuantity; //Spinner for quantity control in search results
 
     //four controllers needs updating when program going on
     private ImageView ivProduct; //image area in searchPage
     private Label lbProductInfo;//product text info in searchPage
-    private TextArea taTrolley; //in trolley Page
     private TextArea taReceipt;//in receipt page
 
     // Holds a reference to this CustomerView window for future access and management
@@ -67,7 +72,21 @@ public class CustomerView  {
         hbRoot.setAlignment(Pos.CENTER);
         hbRoot.setStyle(UIStyle.rootStyle);
 
-        Scene scene = new Scene(hbRoot, WIDTH, HEIGHT);
+        // Create theme selector in top-right corner
+        ComboBox<Theme> cbTheme = createThemeSelector();
+
+        // Create main content with theme selector
+        BorderPane root = new BorderPane();
+        root.setCenter(hbRoot);
+        root.setTop(cbTheme);
+        BorderPane.setAlignment(cbTheme, Pos.TOP_RIGHT);
+        BorderPane.setMargin(cbTheme, new javafx.geometry.Insets(10, 10, 0, 0));
+
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+
+        // Register scene with ThemeManager
+        ThemeManager.getInstance().registerScene(scene);
+
         window.setScene(scene);
         window.setTitle("🛒 HappyShop Customer Client");
         WinPosManager.registerWindow(window,WIDTH,HEIGHT); //calculate position x and y for this window
@@ -79,28 +98,49 @@ public class CustomerView  {
         Label laPageTitle = new Label("Search by Product ID/Name");
         laPageTitle.setStyle(UIStyle.labelTitleStyle);
 
-        Label laId = new Label("ID:      ");
-        laId.setStyle(UIStyle.labelStyle);
-        tfId = new TextField();
-        tfId.setPromptText("eg. 0001");
-        tfId.setStyle(UIStyle.textFiledStyle);
-        HBox hbId = new HBox(10, laId, tfId);
+        // Unified search field
+        tfSearch = new TextField();
+        tfSearch.setPromptText("Enter product ID or name");
+        tfSearch.setStyle(UIStyle.textFiledStyle);
 
-        Label laName = new Label("Name:");
-        laName.setStyle(UIStyle.labelStyle);
-        tfName = new TextField();
-        tfName.setPromptText("implement it if you want");
-        tfName.setStyle(UIStyle.textFiledStyle);
-        HBox hbName = new HBox(10, laName, tfName);
-
-        Label laPlaceHolder = new Label(  " ".repeat(15)); //create left-side spacing so that this HBox aligns with others in the layout.
         Button btnSearch = new Button("Search");
         btnSearch.setStyle(UIStyle.buttonStyle);
         btnSearch.setOnAction(this::buttonClicked);
-        Button btnAddToTrolley = new Button("Add to Trolley");
-        btnAddToTrolley.setStyle(UIStyle.buttonStyle);
-        btnAddToTrolley.setOnAction(this::buttonClicked);
-        HBox hbBtns = new HBox(10, laPlaceHolder,btnSearch, btnAddToTrolley);
+
+        HBox hbSearch = new HBox(10, tfSearch, btnSearch);
+        hbSearch.setAlignment(Pos.CENTER_LEFT);
+
+        // ListView for multiple search results
+        lvSearchResults = new ListView<>();
+        lvSearchResults.setPrefHeight(80);
+        lvSearchResults.setStyle(UIStyle.listViewStyle);
+
+        // Set cell factory to display product ID, description, and price
+        lvSearchResults.setCellFactory(param -> new ListCell<Product>() {
+            @Override
+            protected void updateItem(Product product, boolean empty) {
+                super.updateItem(product, empty);
+                if (empty || product == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%s - %s - £%.2f (Stock: %d)",
+                            product.getProductId(),
+                            product.getProductDescription(),
+                            product.getUnitPrice(),
+                            product.getStockQuantity()));
+                }
+            }
+        });
+
+        // Add mouse click handler to select product from ListView
+        lvSearchResults.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 1) {
+                Product selected = lvSearchResults.getSelectionModel().getSelectedItem();
+                if (selected != null) {
+                    cusController.selectProduct(selected);
+                }
+            }
+        });
 
         ivProduct = new ImageView("imageHolder.jpg");
         ivProduct.setFitHeight(60);
@@ -115,7 +155,20 @@ public class CustomerView  {
         HBox hbSearchResult = new HBox(5, ivProduct, lbProductInfo);
         hbSearchResult.setAlignment(Pos.CENTER_LEFT);
 
-        VBox vbSearchPage = new VBox(15, laPageTitle, hbId, hbName, hbBtns, hbSearchResult);
+        // Quantity control for search results
+        Label laQuantity = new Label("Quantity:");
+        laQuantity.setStyle(UIStyle.labelStyle);
+        spnSearchQuantity = new Spinner<>(1, 999, 1);
+        spnSearchQuantity.setPrefWidth(80);
+        spnSearchQuantity.setEditable(true);
+        HBox hbQuantity = new HBox(10, laQuantity, spnSearchQuantity);
+        hbQuantity.setAlignment(Pos.CENTER_LEFT);
+
+        Button btnAddToTrolley = new Button("Add to Trolley");
+        btnAddToTrolley.setStyle(UIStyle.buttonStyle);
+        btnAddToTrolley.setOnAction(this::buttonClicked);
+
+        VBox vbSearchPage = new VBox(15, laPageTitle, hbSearch, lvSearchResults, hbSearchResult, hbQuantity, btnAddToTrolley);
         vbSearchPage.setPrefWidth(COLUMN_WIDTH);
         vbSearchPage.setAlignment(Pos.TOP_CENTER);
         vbSearchPage.setStyle("-fx-padding: 15px;");
@@ -127,9 +180,13 @@ public class CustomerView  {
         Label laPageTitle = new Label("🛒🛒  Trolley 🛒🛒");
         laPageTitle.setStyle(UIStyle.labelTitleStyle);
 
-        taTrolley = new TextArea();
-        taTrolley.setEditable(false);
-        taTrolley.setPrefSize(WIDTH/2, HEIGHT-50);
+        // Replace TextArea with ListView<Product>
+        lvTrolley = new ListView<>();
+        lvTrolley.setPrefSize(WIDTH/2, HEIGHT-50);
+        lvTrolley.setStyle(UIStyle.listViewStyle);
+
+        // Set cell factory to TrolleyItemCell
+        lvTrolley.setCellFactory(param -> new TrolleyItemCell());
 
         Button btnCancel = new Button("Cancel");
         btnCancel.setOnAction(this::buttonClicked);
@@ -143,7 +200,7 @@ public class CustomerView  {
         hbBtns.setStyle("-fx-padding: 15px;");
         hbBtns.setAlignment(Pos.CENTER);
 
-        vbTrolleyPage = new VBox(15, laPageTitle, taTrolley, hbBtns);
+        vbTrolleyPage = new VBox(15, laPageTitle, lvTrolley, hbBtns);
         vbTrolleyPage.setPrefWidth(COLUMN_WIDTH);
         vbTrolleyPage.setAlignment(Pos.TOP_CENTER);
         vbTrolleyPage.setStyle("-fx-padding: 15px;");
@@ -191,15 +248,21 @@ public class CustomerView  {
     }
 
 
-    public void update(String imageName, String searchResult, String trolley, String receipt) {
-
+    public void update(String imageName, String searchResult, String receipt) {
         ivProduct.setImage(new Image(imageName));
         lbProductInfo.setText(searchResult);
-        taTrolley.setText(trolley);
+
         if (!receipt.equals("")) {
             showTrolleyOrReceiptPage(vbReceiptPage);
             taReceipt.setText(receipt);
         }
+    }
+
+    /**
+     * Updates the trolley ListView with the current trolley items
+     */
+    public void updateTrolley(ArrayList<Product> trolleyItems) {
+        lvTrolley.getItems().setAll(trolleyItems);
     }
 
     // Replaces the last child of hbRoot with the specified page.
@@ -213,6 +276,94 @@ public class CustomerView  {
 
     WindowBounds getWindowBounds() {
         return new WindowBounds(viewWindow.getX(), viewWindow.getY(),
-                  viewWindow.getWidth(), viewWindow.getHeight());
+                viewWindow.getWidth(), viewWindow.getHeight());
+    }
+
+    /**
+     * Create theme selector ComboBox
+     */
+    private ComboBox<Theme> createThemeSelector() {
+        ComboBox<Theme> cbTheme = new ComboBox<>();
+        cbTheme.getItems().addAll(Theme.values());
+        cbTheme.setValue(ThemeManager.getInstance().getCurrentTheme());
+        cbTheme.setStyle(UIStyle.comboBoxStyle);
+
+        // Bind to ThemeManager
+        cbTheme.setOnAction(event -> {
+            Theme selectedTheme = cbTheme.getValue();
+            if (selectedTheme != null) {
+                ThemeManager.getInstance().setTheme(selectedTheme);
+            }
+        });
+
+        return cbTheme;
+    }
+
+    /**
+     * Custom ListCell for trolley items with quantity control and remove button
+     */
+    private class TrolleyItemCell extends ListCell<Product> {
+        private HBox content;
+        private Label lblInfo;
+        private Spinner<Integer> spnQuantity;
+        private Button btnRemove;
+
+        public TrolleyItemCell() {
+            // Label for product info (ID, description, line total)
+            lblInfo = new Label();
+            lblInfo.setPrefWidth(250);
+            lblInfo.setWrapText(true);
+            lblInfo.setStyle("-fx-font-size: 14px;");
+
+            // Spinner for quantity control (range 1-999)
+            spnQuantity = new Spinner<>(1, 999, 1);
+            spnQuantity.setPrefWidth(70);
+            spnQuantity.setEditable(true);
+
+            // Add value change listener to Spinner
+            spnQuantity.valueProperty().addListener((obs, oldVal, newVal) -> {
+                Product product = getItem();
+                if (product != null && newVal != null) {
+                    cusController.updateQuantity(product, newVal);
+                }
+            });
+
+            // Remove button with red styling
+            btnRemove = new Button("Remove");
+            btnRemove.setStyle(UIStyle.redFillBtnStyle);
+            btnRemove.setOnAction(e -> {
+                Product product = getItem();
+                if (product != null) {
+                    cusController.removeFromTrolley(product);
+                }
+            });
+
+            // Layout components in HBox with proper alignment
+            content = new HBox(10, lblInfo, spnQuantity, btnRemove);
+            content.setAlignment(Pos.CENTER_LEFT);
+            content.setStyle("-fx-padding: 5px;");
+        }
+
+        @Override
+        protected void updateItem(Product product, boolean empty) {
+            super.updateItem(product, empty);
+            if (empty || product == null) {
+                setGraphic(null);
+            } else {
+                // Display product info: ID, description, line total
+                double lineTotal = product.getUnitPrice() * product.getOrderedQuantity();
+                lblInfo.setText(String.format("%s - %s\n£%.2f × %d = £%.2f",
+                        product.getProductId(),
+                        product.getProductDescription(),
+                        product.getUnitPrice(),
+                        product.getOrderedQuantity(),
+                        lineTotal));
+
+                // Set spinner value to current quantity
+                spnQuantity.getValueFactory().setValue(product.getOrderedQuantity());
+
+                setGraphic(content);
+            }
+        }
     }
 }
