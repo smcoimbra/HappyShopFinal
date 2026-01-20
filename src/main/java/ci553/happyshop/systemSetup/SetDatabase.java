@@ -30,7 +30,7 @@ public class SetDatabase {
 
     //Use the shared database URL from the factory, appending `;create=true` to create the database if it doesn't exist
     private static final String dbURL = DatabaseRWFactory.dbURL + ";create=true";
-                                  //the value is "jdbc:derby:happyShopDB;create=true"
+    //the value is "jdbc:derby:happyShopDB;create=true"
 
     private static Path imageWorkingFolderPath = StorageLocation.imageFolderPath;
     private static Path imageBackupFolderPath = StorageLocation.imageResetFolderPath;
