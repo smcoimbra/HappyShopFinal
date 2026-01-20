@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**validation and managing the users.*/
+/**validation and managing users.*/
 public class CredentialStore {
     private static CredentialStore instance;
     private Map<String, User> users;
